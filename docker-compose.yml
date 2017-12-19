@@ -1,0 +1,37 @@
+version: "3"
+services:
+  # Redis for high-performance key-value storage and cache
+  redis:
+    image: redis:4.0.6-alpine
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+  # MongoDB for general-purpose, persistent data storage
+  db:
+    image: mongo:3.4.10-jessie
+    volumes:
+      - db-data:/data/db
+    networks:
+      - backend
+
+  # nginx for glueing outside world with the application
+  proxy:
+    image: nginx:1.13.7-alpine
+    ports:
+      - 80:80
+    networks:
+      - frontend
+  # TODO Varnish
+  # TODO Workers
+  # TODO HTTP Server
+
+
+networks:
+  backend:
+  frontend:
+
+volumes:
+  db-data:
+  redis-data:
+  media-data:
