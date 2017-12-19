@@ -22,6 +22,16 @@ services:
       - 80:80
     networks:
       - frontend
+
+  # RabbitMQ for message passing between application services
+  rabbitmq:
+    image: rabbitmq:3.7.0-management-alpine
+    ports:
+      - 2000:15672 # management panel; creds guest/guest
+    networks:
+      - backend
+
+
   # TODO Varnish
   # TODO Workers
   # TODO HTTP Server
