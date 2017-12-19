@@ -3,7 +3,9 @@ services:
   # Redis for high-performance key-value storage and cache
   redis:
     image: redis:4.0.6-alpine
+    command: /redis.conf
     volumes:
+      - ./redis/redis.conf:/redis.conf
       - redis-data:/data
     networks:
       - backend
