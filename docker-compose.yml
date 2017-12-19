@@ -31,6 +31,14 @@ services:
     networks:
       - backend
 
+  http-server:
+    build: ./http
+    ports:
+      - 5000:5000
+    networks:
+      - frontend
+      - backend
+
 
   # TODO Varnish
   # TODO Workers
