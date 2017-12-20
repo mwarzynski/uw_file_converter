@@ -35,13 +35,14 @@ services:
     networks:
       - backend
 
+  # Multiple instances of backend HTTP servers handling API requests
   http-server:
     build: ./http
     networks:
       - frontend
       - backend
     volumes:
-      - files-data:/var/upload
+      - files-data:/upload
 
 
 networks:
