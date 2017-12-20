@@ -5,10 +5,10 @@ services:
     image: redis:4.0.6-alpine
     command: /redis.conf
     volumes:
-      - ./redis/redis.conf:/redis.conf
       - redis-data:/data
     networks:
       - backend
+
   # MongoDB for general-purpose, persistent data storage
   db:
     image: mongo:3.4.10-jessie
@@ -40,11 +40,8 @@ services:
     networks:
       - frontend
       - backend
-
-
-  # TODO Varnish
-  # TODO Workers
-  # TODO HTTP Server
+    volumes:
+      - files-data:/var/upload
 
 
 networks:
@@ -55,3 +52,4 @@ volumes:
   db-data:
   redis-data:
   media-data:
+  files-data:
