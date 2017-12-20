@@ -25,7 +25,7 @@ services:
     networks:
       - frontend
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx:/etc/nginx
 
   # RabbitMQ for message passing between application services
   rabbitmq:
@@ -37,8 +37,6 @@ services:
 
   http-server:
     build: ./http
-    ports:
-      - 5000:5000
     networks:
       - frontend
       - backend
