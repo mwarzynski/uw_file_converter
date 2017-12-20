@@ -1,4 +1,5 @@
-import piko
+import pika
+
 
 class Messages:
 
@@ -17,5 +18,3 @@ class Messages:
 
     def send(self, message):
         self.channel.basic_publish(exchange="", routing_key=self.queue, body=message)
-
-
