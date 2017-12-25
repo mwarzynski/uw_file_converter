@@ -6,8 +6,8 @@ import os
 
 __UPLOAD__ = "/upload"
 
-log = logging.getLogger("upload")
-log.setLevel(logging.INFO)
+LOG = logging.getLogger("upload")
+LOG.setLevel(logging.DEBUG)
 
 def get_upload_token():
     return str(uuid.uuid4())
@@ -16,24 +16,29 @@ def get_upload_token():
 class UploadHandler(tornado.web.RequestHandler):
     """ Handler for PUT upload requests """
 
-    @property
-    def redis(self):
-        return self.application.redis
+    def __init__(self, *args, **kwargs):
+        self.file = None
+        self.mongo = None
 
-    def initialize(self):
+        super(UploadHandler, self).__init__(*args, **kwargs)
+
+    def initialize(self, mongo):
         self.bytes_read = 0
-  
-    def prepare(self):
+        self.mongo = mongo
+
+    async def prepare(self):
         token = self.path_args[0]
         # Check if token is valid
         if True:
+            await self.mongo.uploaded.insert_one({
+                'token': token
+            })
             path = os.path.join(__UPLOAD__, token)
-            log.info("Opening %s..." % path)
+            LOG.debug("Opening %s...", path)
             self.file = open(path, "wb")
 
-
     def put(self, token):
-        log.info("PUT %s" % token)
+        LOG.info("PUT %s" % token)
         self.write({
             'status': 'OK',
             'bytesReceived': self.bytes_read
@@ -42,6 +47,12 @@ class UploadHandler(tornado.web.RequestHandler):
     def data_received(self, chunk):
         self.file.write(chunk)
         self.bytes_read += len(chunk)
+  
+    def on_finish(self):
+        LOG.debug("Closing file...")
+        if self.file:
+            self.file.close()
+            self.file = None
 
 class UploadRequestHandler(tornado.web.RequestHandler):
 

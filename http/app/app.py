@@ -6,6 +6,7 @@ import sys
 import signal
 import tornado.ioloop
 import tornado.web
+import motor.motor_tornado
 from module.upload import (UploadHandler, UploadRequestHandler)
 
 def term_handler():
@@ -24,10 +25,12 @@ class Application(tornado.web.Application):
     """ Main application controller """
 
     def __init__(self):
+        self.mongo = motor.motor_tornado.MotorClient('db', 27017).convertdb
+
         handlers = [
             (r"/", MainHandler),
             (r"/upload/request", UploadRequestHandler),
-            (r"/upload/(.*)", UploadHandler)
+            (r"/upload/(.*)", UploadHandler, dict(mongo=self.mongo))
         ]
         super(Application, self).__init__(handlers)
 
