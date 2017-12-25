@@ -6,6 +6,7 @@ import sys
 import signal
 import tornado.ioloop
 import tornado.web
+from module.upload import (UploadHandler, UploadRequestHandler)
 
 def term_handler():
     """ Handle SIGTERM signal from Docker """
@@ -19,19 +20,24 @@ class MainHandler(tornado.web.RequestHandler):
     def get(self, *args, **kwargs):
         self.write("Hello, world")
 
-def make_app():
-    """ Build main app """
-    return tornado.web.Application([
-        (r"/", MainHandler),
-    ])
+class Application(tornado.web.Application):
+    """ Main application controller """
+
+    def __init__(self):
+        handlers = [
+            (r"/", MainHandler),
+            (r"/upload/request", UploadRequestHandler),
+            (r"/upload/(.*)", UploadHandler)
+        ]
+        super(Application, self).__init__(handlers)
 
 if __name__ == "__main__":
     log = logging.getLogger()
-    log.setLevel("debug")
+    log.setLevel(logging.INFO)
     signal.signal(signal.SIGTERM, term_handler)
 
     try:
-        app = make_app()
+        app = Application()
         app.listen(5000)
         tornado.ioloop.IOLoop.current().start()
     finally:

@@ -1,4 +1,4 @@
-FROM python:3.6.3-alpine3.7
+FROM python:3.6.4-stretch
 COPY ./requirements.txt /requirements.txt
 RUN pip install -r requirements.txt
 COPY ./app /app
