@@ -26,7 +26,10 @@ def make_app():
     ])
 
 if __name__ == "__main__":
+    log = logging.getLogger()
+    log.setLevel("debug")
     signal.signal(signal.SIGTERM, term_handler)
+
     try:
         app = make_app()
         app.listen(5000)
