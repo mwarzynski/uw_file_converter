@@ -4,6 +4,8 @@ import tornado.web
 import logging
 import os
 
+from .auth import AuthBaseHandler
+
 __UPLOAD__ = "/upload"
 
 LOG = logging.getLogger("upload")
@@ -13,7 +15,7 @@ def get_upload_token():
     return str(uuid.uuid4())
 
 @tornado.web.stream_request_body
-class UploadHandler(tornado.web.RequestHandler):
+class UploadHandler(AuthBaseHandler):
     """ Handler for PUT upload requests """
 
     def __init__(self, *args, **kwargs):
@@ -53,8 +55,3 @@ class UploadHandler(tornado.web.RequestHandler):
         if self.file:
             self.file.close()
             self.file = None
-
-class UploadRequestHandler(tornado.web.RequestHandler):
-
-    def get(self):
-        self.write(get_upload_token())

@@ -1,22 +1,19 @@
-"""
-Main module of HTTP Server
-"""
+""" Main module of HTTP Server """
 import logging
 import sys
 import signal
 import tornado.ioloop
 import tornado.web
 import motor.motor_tornado
-from module.upload import (UploadHandler, UploadRequestHandler)
+from module.upload import UploadHandler
+from module.auth import (LoginHandler, LogoutHandler)
 
-def term_handler():
+def term_handler(sig, frame):
     """ Handle SIGTERM signal from Docker """
     sys.exit(0)
 
 class MainHandler(tornado.web.RequestHandler):
     """ Handler class for incoming HTTP requests """
-    def data_received(self, chunk):
-        pass
 
     def get(self, *args, **kwargs):
         self.write("Hello, world")
@@ -29,10 +26,15 @@ class Application(tornado.web.Application):
 
         handlers = [
             (r"/", MainHandler),
-            (r"/upload/request", UploadRequestHandler),
-            (r"/upload/(.*)", UploadHandler, dict(mongo=self.mongo))
+            (r"/api/v1/auth/login", LoginHandler, dict(mongo=self.mongo)),
+            (r"/api/v1/auth/logout", LogoutHandler, dict(mongo=self.mongo)),
+            (r"/api/v1/upload/(.*)", UploadHandler, dict(mongo=self.mongo))
         ]
-        super(Application, self).__init__(handlers)
+
+        settings = {
+            "cookie_secret": "4llY0urBa53Ar3B310ngT0U5"
+        }
+        super(Application, self).__init__(handlers, **settings)
 
 if __name__ == "__main__":
     log = logging.getLogger()
