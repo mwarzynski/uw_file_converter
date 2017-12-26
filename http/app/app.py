@@ -11,15 +11,19 @@ from module.auth import (LoginHandler, LogoutHandler)
 
 STATIC_DIR = "./static"
 
+LOG = logging.getLogger()
+LOG.setLevel(logging.DEBUG)
+
+
 def term_handler(sig, frame):
     """ Handle SIGTERM signal from Docker """
     sys.exit(0)
 
-class MainHandler(tornado.web.RequestHandler):
-    """ Handler class for incoming HTTP requests """
 
-    def get(self, *args, **kwargs):
-        self.write("Hello, world")
+class XSRFStaticHandler(tornado.web.StaticFileHandler):
+    def prepare(self):
+        self.xsrf_token
+
 
 class Application(tornado.web.Application):
     """ Main application controller """
@@ -31,18 +35,19 @@ class Application(tornado.web.Application):
             (r"/api/v1/auth/login", LoginHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/logout", LogoutHandler, dict(mongo=self.mongo)),
             (r"/api/v1/upload/(.*)", UploadHandler, dict(mongo=self.mongo)),
-            (r"/()$", tornado.web.StaticFileHandler, dict(path=os.path.join(STATIC_DIR,"index.html"))),
-            (r"/(.*)", tornado.web.StaticFileHandler, dict(path=STATIC_DIR)),
+            (r"/()$", XSRFStaticHandler,
+             dict(path=os.path.join(STATIC_DIR, "index.html"))),
+            (r"/(.*)", XSRFStaticHandler, dict(path=STATIC_DIR)),
         ]
 
         settings = {
-            "cookie_secret": "4llY0urBa53Ar3B310ngT0U5"
+            "cookie_secret": "4llY0urBa53Ar3B310ngT0U5",
+            "xsrf_cookies": True
         }
         super(Application, self).__init__(handlers, **settings)
 
+
 if __name__ == "__main__":
-    log = logging.getLogger()
-    log.setLevel(logging.INFO)
     signal.signal(signal.SIGTERM, term_handler)
 
     try:

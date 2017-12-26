@@ -18,11 +18,16 @@
         <input type="submit">
     </form>
     <script>
-        $("#loginForm").submit(function (event){
+        function getCookie(name) {
+            var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+            return r ? r[1] : undefined;
+        }
+
+        $("#loginForm").submit(function (event) {
             let login = $("input[name=username]").val();
             let password = $("input[name=password]").val();
             console.log(login + ":" + password);
-            $.post( "/api/v1/auth/login", { user: login, password: password } );
+            $.post("/api/v1/auth/login", { user: login, password: password, _xsrf: getCookie("_xsrf") });
             event.preventDefault();
         });
     </script>
