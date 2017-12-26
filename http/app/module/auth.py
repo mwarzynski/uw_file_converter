@@ -22,6 +22,9 @@ def blocking(method):
         return await to_tornado_future(fut)
     return wrapper
 
+class UnauthorizedError(tornado.web.HTTPError):
+    def __init__(self):
+        super(UnauthorizedError, self).__init__(401)
 
 class AuthBaseHandler(tornado.web.RequestHandler):
     @blocking
@@ -66,10 +69,11 @@ class LoginHandler(AuthBaseHandler):
 
         if not pass_ok:
             LOG.warning("Invalid password for user %s", username)
-            raise tornado.web.HTTPError(401)
+            raise UnauthorizedError()
 
         LOG.info('Password match for user %s', username)
         self.set_secure_cookie("user", username)
+        self.write("OK")
 
 
 class LogoutHandler(AuthBaseHandler):

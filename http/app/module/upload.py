@@ -4,15 +4,17 @@ import tornado.web
 import logging
 import os
 
-from .auth import AuthBaseHandler
+from .auth import (AuthBaseHandler, UnauthorizedError)
 
 __UPLOAD__ = "/upload"
 
 LOG = logging.getLogger("upload")
 LOG.setLevel(logging.DEBUG)
 
+
 def get_upload_token():
     return str(uuid.uuid4())
+
 
 @tornado.web.stream_request_body
 class UploadHandler(AuthBaseHandler):
@@ -29,18 +31,19 @@ class UploadHandler(AuthBaseHandler):
         self.mongo = mongo
 
     async def prepare(self):
-        token = self.path_args[0]
-        # Check if token is valid
-        if True:
-            await self.mongo.uploaded.insert_one({
-                'token': token
-            })
-            path = os.path.join(__UPLOAD__, token)
-            LOG.debug("Opening %s...", path)
-            self.file = open(path, "wb")
+        if not self.current_user:
+            raise UnauthorizedError()
 
-    def put(self, token):
-        LOG.info("PUT %s" % token)
+        token = str(uuid.uuid4())
+        await self.mongo.uploaded.insert_one({
+            'token': token,
+            'user': self.current_user
+        })
+        path = os.path.join(__UPLOAD__, token)
+        LOG.debug("Opening %s...", path)
+        self.file = open(path, "wb")
+
+    def put(self):
         self.write({
             'status': 'OK',
             'bytesReceived': self.bytes_read
@@ -49,7 +52,7 @@ class UploadHandler(AuthBaseHandler):
     def data_received(self, chunk):
         self.file.write(chunk)
         self.bytes_read += len(chunk)
-  
+
     def on_finish(self):
         LOG.debug("Closing file...")
         if self.file:
