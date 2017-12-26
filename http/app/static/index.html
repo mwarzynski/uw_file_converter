@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>File Converter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <form id="loginForm">
+        <input name="username" placeholder="Username">
+        <input name="password" type="password" placeholder="Password">
+        <input type="submit">
+    </form>
+    <script>
+        $("#loginForm").submit(function (event){
+            let login = $("input[name=username]").val();
+            let password = $("input[name=password]").val();
+            console.log(login + ":" + password);
+            $.post( "/api/v1/auth/login", { user: login, password: password } );
+            event.preventDefault();
+        });
+    </script>
+</body>
+
+</html>

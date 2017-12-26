@@ -23,17 +23,16 @@ def blocking(method):
     return wrapper
 
 
-@blocking
-def hash_password(password):
-    return bcrypt.hashpw(password, bcrypt.gensalt())
-
-
-@blocking
-def verify_password(password, hashed_password):
-    return bcrypt.checkpw(password, hashed_password)
-
-
 class AuthBaseHandler(tornado.web.RequestHandler):
+    @blocking
+    def hash_password(self, password):
+        return bcrypt.hashpw(password, bcrypt.gensalt())
+
+
+    @blocking
+    def verify_password(self, password, hashed_password):
+        return bcrypt.checkpw(password, hashed_password)
+
     def get_current_user(self):
         return self.get_secure_cookie("user")
 
@@ -42,7 +41,7 @@ class LoginHandler(AuthBaseHandler):
     """
     MongoDB collection - users
     user = {
-        "username" - login 
+        "username" - login
         "hashed_password" - bcrypt hashed password
     }
     """
@@ -63,7 +62,7 @@ class LoginHandler(AuthBaseHandler):
             raise tornado.web.HTTPError(401)
 
         LOG.debug('Found user %s', username)
-        pass_ok = await verify_password(user_pass, tornado.escape.utf8(user["hashed_password"]))
+        pass_ok = await self.verify_password(user_pass, tornado.escape.utf8(user["hashed_password"]))
 
         if not pass_ok:
             LOG.warning("Invalid password for user %s", username)

@@ -1,5 +1,6 @@
 """ Main module of HTTP Server """
 import logging
+import os
 import sys
 import signal
 import tornado.ioloop
@@ -7,6 +8,8 @@ import tornado.web
 import motor.motor_tornado
 from module.upload import UploadHandler
 from module.auth import (LoginHandler, LogoutHandler)
+
+STATIC_DIR = "./static"
 
 def term_handler(sig, frame):
     """ Handle SIGTERM signal from Docker """
@@ -25,10 +28,11 @@ class Application(tornado.web.Application):
         self.mongo = motor.motor_tornado.MotorClient('db', 27017).convertdb
 
         handlers = [
-            (r"/", MainHandler),
             (r"/api/v1/auth/login", LoginHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/logout", LogoutHandler, dict(mongo=self.mongo)),
-            (r"/api/v1/upload/(.*)", UploadHandler, dict(mongo=self.mongo))
+            (r"/api/v1/upload/(.*)", UploadHandler, dict(mongo=self.mongo)),
+            (r"/()$", tornado.web.StaticFileHandler, dict(path=os.path.join(STATIC_DIR,"index.html"))),
+            (r"/(.*)", tornado.web.StaticFileHandler, dict(path=STATIC_DIR)),
         ]
 
         settings = {
