@@ -8,6 +8,8 @@ import tornado.web
 import motor.motor_tornado
 from module.upload import UploadHandler
 from module.auth import (LoginHandler, LogoutHandler)
+from module.convert import ConvertHandler
+from messages.writer import Writer
 
 STATIC_DIR = "./static"
 
@@ -29,15 +31,17 @@ class Application(tornado.web.Application):
     """ Main application controller """
 
     def __init__(self):
+        self.writer = Writer()
         self.mongo = motor.motor_tornado.MotorClient('db', 27017).convertdb
 
         handlers = [
             (r"/api/v1/auth/login", LoginHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/logout", LogoutHandler, dict(mongo=self.mongo)),
             (r"/api/v1/upload", UploadHandler, dict(mongo=self.mongo)),
+            (r"/api/v1/convert", ConvertHandler, dict(mongo=self.mongo,writer=self.writer)),
             (r"/()$", XSRFStaticHandler,
              dict(path=os.path.join(STATIC_DIR, "index.html"))),
-            (r"/(.*)", XSRFStaticHandler, dict(path=STATIC_DIR)),
+            (r"/static/(.*)", XSRFStaticHandler, dict(path=STATIC_DIR)),
         ]
 
         settings = {
@@ -51,7 +55,8 @@ if __name__ == "__main__":
     signal.signal(signal.SIGTERM, term_handler)
 
     try:
-        app = Application()
+        # Intitialize HTTP server.
+        app = Application(writer)
         app.listen(5000)
         tornado.ioloop.IOLoop.current().start()
     finally:

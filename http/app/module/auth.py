@@ -22,15 +22,16 @@ def blocking(method):
         return await to_tornado_future(fut)
     return wrapper
 
+
 class UnauthorizedError(tornado.web.HTTPError):
     def __init__(self):
         super(UnauthorizedError, self).__init__(401)
+
 
 class AuthBaseHandler(tornado.web.RequestHandler):
     @blocking
     def hash_password(self, password):
         return bcrypt.hashpw(password, bcrypt.gensalt())
-
 
     @blocking
     def verify_password(self, password, hashed_password):
