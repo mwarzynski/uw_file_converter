@@ -9,9 +9,6 @@ __UPLOAD__ = "/upload"
 
 class Converter:
 
-    # Allows to send message via Rabbit.
-    notifier = None
-
     def __init__(self, notifier):
         self.notifier = notifier
 
@@ -19,9 +16,10 @@ class Converter:
         data = json.loads(body)
 
         try:
-            input = __UPLOAD__ + "/" + data['file']
+            input = __UPLOAD__ + "/" + data['token']
             type_from = data['convert_from']
             type_to = data['convert_to']
+            user = data['user']
         except KeyError as e:
             LOG.info("Invalid message key: " + str(e))
             return
@@ -35,10 +33,10 @@ class Converter:
             return
         except Exception as e:
             LOG.debug(e)
-            self.notify(input, "", "error")
+            self.notify(user, input, "", "error")
             return
 
-        self.notify(input, output, "done")
+        self.notify(user, input, output, "done")
 
     def convert(self, type_from, type_to, input, output):
         with open(input, 'rb') as f:
@@ -51,8 +49,9 @@ class Converter:
 
         pass
 
-    def notify(self, input, output, status):
+    def notify(self, user, input, output, status):
         message = {
+            "user": user,
             "file": input,
             "file-output": output,
             "status": status
