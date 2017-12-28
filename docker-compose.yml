@@ -1,14 +1,15 @@
 version: "3"
 services:
-  # Redis for high-performance key-value storage and cache
-  redis:
-    image: redis:4.0.6-alpine
-    command: /redis.conf
+  # RabbitMQ for message passing between application services
+  rabbitmq:
+    image: rabbitmq:3.7.0-management-alpine
     volumes:
-      - redis-data:/data
+      - ./rabbit/config:/etc/rabbitmq/rabbitmq.config
+    ports:
+      - 2000:15672 # management panel; creds guest/guest
     networks:
       - backend
-
+   
   # MongoDB for general-purpose, persistent data storage
   db:
     image: mongo:3.4.10-jessie
@@ -26,14 +27,8 @@ services:
       - frontend
     volumes:
       - ./nginx:/etc/nginx
-
-  # RabbitMQ for message passing between application services
-  rabbitmq:
-    image: rabbitmq:3.7.0-management-alpine
-    ports:
-      - 2000:15672 # management panel; creds guest/guest
-    networks:
-      - backend
+    depends_on:
+      - "http-server"
 
   # Multiple instances of backend HTTP servers handling API requests
   http-server:
@@ -43,6 +38,9 @@ services:
       - backend
     volumes:
       - files-data:/upload
+    depends_on:
+      - "rabbitmq"
+      - "db"
 
   # Multiple instances of workers which convert the uploaded files.
   worker:
@@ -51,6 +49,9 @@ services:
       - backend
     volumes:
       - files-data:/upload
+    depends_on:
+      - "rabbitmq"
+      - "db"
 
 networks:
   backend:
@@ -58,6 +59,5 @@ networks:
 
 volumes:
   db-data:
-  redis-data:
   media-data:
   files-data:

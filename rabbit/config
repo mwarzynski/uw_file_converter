@@ -1,0 +1,15 @@
+[
+   {rabbit, [
+      {loopback_users, [
+        {guest, false}
+      ]},
+      {heartbeat, 0},
+      {hipe_compile, false},
+      {management, [
+        {listener, [
+            {port, 15672},
+            {ssl, false}
+        ]}
+      ]}
+    ]}
+].
