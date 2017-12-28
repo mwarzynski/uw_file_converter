@@ -24,7 +24,10 @@ class Reader:
     def listen(self, callback):
         for method_frame, properties, body in self.channel.consume(self.queue):
             # Do something with the data.
-            callback(body)
+            try:
+                callback(body)
+            except Exception as e:
+                LOG.error(e)
 
             # Notify that the message is acknowledged.
             self.channel.basic_ack(method_frame.delivery_tag)

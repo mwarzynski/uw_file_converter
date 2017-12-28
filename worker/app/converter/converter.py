@@ -1,5 +1,7 @@
 import json
 import logging
+import time
+from pymongo import MongoClient
 
 LOG = logging.getLogger('converter')
 LOG.setLevel(logging.DEBUG)
@@ -10,13 +12,16 @@ __UPLOAD__ = "/upload"
 class Converter:
 
     def __init__(self, notifier):
+        mongo_client = MongoClient('db', 27017)
+        self.mongo = mongo_client.convertdb
         self.notifier = notifier
 
     def on_message(self, body):
         data = json.loads(body)
 
         try:
-            input = __UPLOAD__ + "/" + data['token']
+            token = data['token']
+            input = __UPLOAD__ + "/" + token
             type_from = data['convert_from']
             type_to = data['convert_to']
             user = data['user']
@@ -26,6 +31,13 @@ class Converter:
 
         output = input + "." + str(type_to)
 
+        message = {
+            "user": user,
+            "token": token,
+            "file-input": input,
+            "file-output": output
+        }
+
         try:
             self.convert(type_from, type_to, input, output)
         except FileNotFoundError:
@@ -33,10 +45,12 @@ class Converter:
             return
         except Exception as e:
             LOG.debug(e)
-            self.notify(user, input, "", "error")
+            message["status"] = "error"
+            self.notify(message)
             return
 
-        self.notify(user, input, output, "done")
+        message["status"] = "done"
+        self.notify(message)
 
     def convert(self, type_from, type_to, input, output):
         with open(input, 'rb') as f:
@@ -49,12 +63,12 @@ class Converter:
 
         pass
 
-    def notify(self, user, input, output, status):
-        message = {
-            "user": user,
-            "file": input,
-            "file-output": output,
-            "status": status
-        }
+    def notify(self, message):
+        message['converted_at'] = int(time.time())
+        self.mongo.converts.update(
+                { 'token': message["token"] },
+                message,
+                upsert=True
+        )
         self.notifier.send(json.dumps(message))
 
