@@ -44,6 +44,13 @@ services:
     volumes:
       - files-data:/upload
 
+  # Multiple instances of workers which convert the uploaded files.
+  worker:
+    build: ./worker
+    networks:
+      - backend
+    volumes:
+      - files-data:/upload
 
 networks:
   backend:
