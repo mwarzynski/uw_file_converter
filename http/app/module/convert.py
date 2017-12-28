@@ -50,6 +50,7 @@ class ConvertHandler(AuthBaseHandler):
             'user': self.current_user
         })
         if not exists:
+            LOG.warning("There is no uploaded file for token: " + str(token))
             self.clear()
             self.set_status(404)
             return

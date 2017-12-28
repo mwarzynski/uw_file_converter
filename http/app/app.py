@@ -7,6 +7,7 @@ import tornado.ioloop
 import tornado.web
 import motor.motor_tornado
 from module.upload import UploadHandler
+from module.download import DownloadHandler
 from module.auth import (LoginHandler, LogoutHandler)
 from module.convert import ConvertHandler
 from messages.writer import Writer
@@ -38,6 +39,7 @@ class Application(tornado.web.Application):
             (r"/api/v1/auth/login", LoginHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/logout", LogoutHandler, dict(mongo=self.mongo)),
             (r"/api/v1/upload", UploadHandler, dict(mongo=self.mongo)),
+            (r"/api/v1/download/(.*)", DownloadHandler, dict(mongo=self.mongo)),
             (r"/api/v1/convert", ConvertHandler, dict(mongo=self.mongo,rabbit=self.writer)),
             (r"/()$", XSRFStaticHandler,
              dict(path=os.path.join(STATIC_DIR, "index.html"))),
