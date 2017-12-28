@@ -1,7 +1,11 @@
 import pika
+import logging
+
+LOG = logging.getLogger('consumer')
+LOG.setLevel(logging.DEBUG)
 
 
-class Consumer:
+class Reader:
 
     queue = "to-convert"
 
@@ -16,12 +20,10 @@ class Consumer:
         self.channel.close()
         self.connection.close()
 
-    def run(self):
+    def listen(self, callback):
         for method_frame, properties, body in self.channel.consume(self.queue):
-            # Do something.
-            print(method_frame)
-            print(properties)
-            print(body)
+            # Do something with the data.
+            callback(body)
 
             # Notify that the message is acknowledged.
             self.channel.basic_ack(method_frame.delivery_tag)
