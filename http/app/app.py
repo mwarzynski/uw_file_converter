@@ -38,7 +38,7 @@ class Application(tornado.web.Application):
             (r"/api/v1/auth/login", LoginHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/logout", LogoutHandler, dict(mongo=self.mongo)),
             (r"/api/v1/upload", UploadHandler, dict(mongo=self.mongo)),
-            (r"/api/v1/convert", ConvertHandler, dict(mongo=self.mongo,writer=self.writer)),
+            (r"/api/v1/convert", ConvertHandler, dict(mongo=self.mongo,rabbit=self.writer)),
             (r"/()$", XSRFStaticHandler,
              dict(path=os.path.join(STATIC_DIR, "index.html"))),
             (r"/static/(.*)", XSRFStaticHandler, dict(path=STATIC_DIR)),
@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     try:
         # Intitialize HTTP server.
-        app = Application(writer)
+        app = Application()
         app.listen(5000)
         tornado.ioloop.IOLoop.current().start()
     finally:

@@ -9,9 +9,9 @@ class Writer:
     channel = None
 
     def __init__(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq', retry_delay=1, connection_attempts=60))
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.queue)
+        self.channel.queue_declare(self.queue, auto_delete=False)
 
     def __del__(self):
         if self.connection is not None:

@@ -18,7 +18,7 @@ class ConvertHandler(AuthBaseHandler):
     def __init__(self, *args, **kwargs):
         self.file = None
         self.mongo = None
-        self.messages = None
+        self.rabbit = None
 
         super(ConvertHandler, self).__init__(*args, **kwargs)
 
@@ -28,9 +28,9 @@ class ConvertHandler(AuthBaseHandler):
         else:
             self.json_args = None
 
-    def initialize(self, mongo, messages):
+    def initialize(self, mongo, rabbit):
         self.mongo = mongo
-        self.messages = messages
+        self.rabbit = rabbit
 
     async def post(self):
         if not self.current_user:
@@ -62,5 +62,5 @@ class ConvertHandler(AuthBaseHandler):
             'token': token,
             'user': self.current_user.decode('utf-8')
         }
-        self.messages.send(json.dumps(message))
+        self.rabbit.send(json.dumps(message))
 
