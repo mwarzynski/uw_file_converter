@@ -3,6 +3,8 @@ import logging
 import time
 from pymongo import MongoClient
 
+from .converter_music import ConverterMusic
+
 LOG = logging.getLogger('converter')
 LOG.setLevel(logging.DEBUG)
 
@@ -10,6 +12,10 @@ __UPLOAD__ = "/upload"
 
 
 class Converter:
+
+    converters = [
+        ConverterMusic()
+    ]
 
     def __init__(self, notifier):
         mongo_client = MongoClient('db', 27017)
@@ -41,10 +47,11 @@ class Converter:
         try:
             self.convert(type_from, type_to, input, output)
         except FileNotFoundError:
-            LOG.info("Invalid token.")
+            message["status"] = "file not found"
+            self.notify(message)
             return
         except Exception as e:
-            LOG.debug(e)
+            LOG.error(e)
             message["status"] = "error"
             self.notify(message)
             return
@@ -53,15 +60,10 @@ class Converter:
         self.notify(message)
 
     def convert(self, type_from, type_to, input, output):
-        with open(input, 'rb') as f:
-            data = f.read()
-
-        # TODO: Convert the file accordingly to types.
-
-        with open(output, 'wb') as f:
-            f.write(data)
-
-        pass
+        for converter in self.converters:
+            if converter.can_convert(type_from, type_to):
+                converter.convert(type_from, type_to, input, output)
+                break
 
     def notify(self, message):
         message['converted_at'] = int(time.time())
@@ -70,5 +72,5 @@ class Converter:
                 message,
                 upsert=True
         )
-        self.notifier.send(json.dumps(message))
+        self.notifier.send(json.dumps(message), queue="done")
 
