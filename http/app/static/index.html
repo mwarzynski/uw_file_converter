@@ -1,40 +1,88 @@
-<!DOCTYPE html>
 <html>
 
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
+
     <title>File Converter</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="static/main.css" />
-    <script src="static/main.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-        crossorigin="anonymous"></script>
+    <meta name="description" content="">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <form id="loginForm">
-        <input name="username" placeholder="Username">
-        <input name="password" type="password" placeholder="Password">
-        <input type="submit">
-    </form>
-    <form id="uploadForm">
-        <input name="file" type="file">
-        <input type="submit">
-    </form>
-    <script>
-        function getCookie(name) {
-            var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
-            return r ? r[1] : undefined;
+<!-- Header -->
+<div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand">JNP Project - <strong>File Converter</strong></a>
+        </div>
+    </div>
+</div>
+
+<!-- Container -->
+<div class="container">
+    <section>
+        <span class="btn btn-success fileinput-button">
+            <span>Upload files</span>
+            <input id="fileupload" type="file" name="files[]" multiple>
+        </span>
+        <div id="progress" class="progress">
+            <div class="progress-bar progress-bar-success"></div>
+        </div>
+    </section>
+</div>
+</script>
+
+<script src="js/jquery.min.js"></script>
+
+<script type="text/javascript">
+$(function () {
+    'use strict';
+
+    $("#fileupload").change((event) => {
+   
+        let input = event.target;
+        let reader = new FileReader();
+
+        reader.onload = function(){
+            let arrayBuffer = reader.result;
+            let arrayBufferView = new Uint8Array( arrayBuffer );
+            let blob = new Blob( [ arrayBufferView ], { type: input.files[0].type } );
+
+            $.ajax({  
+                url: '/api/v1/upload',  
+                type: 'PUT',  
+                contentType: input.files[0].type,
+                data: arrayBuffer,  
+                processData: false,
+                xhr: function()
+                {
+                    let xhr = new window.XMLHttpRequest();
+                    // TODO: set valid X-XSRFToken for upload request.
+                    xhr.setRequestHeader('X-XSRFToken', $.cookie("_xsrf"));
+                    xhr.upload.addEventListener("progress", function(data){
+                        if (data.lengthComputable) {
+                          var progress = parseInt( parseFloat(data.loaded / data.total) * 100);
+                          $('#progressPercentage').css( 'width', progress + '%'); 
+                        }
+                    }, false);
+                    return xhr;
+                },
+
+                success : function(result) {
+                    console.log(result);
+                },
+
+            }); 
         }
+        reader.readAsArrayBuffer(input.files[0]);
 
-        $("#loginForm").submit(function (event) {
-            let login = $("input[name=username]").val();
-            let password = $("input[name=password]").val();
-            console.log(login + ":" + password);
-            $.post("/api/v1/auth/login", { user: login, password: password, _xsrf: getCookie("_xsrf") });
-            event.preventDefault();
-        });
-    </script>
+    });
+});
+</script>
+
 </body>
-
 </html>

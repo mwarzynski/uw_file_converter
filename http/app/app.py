@@ -43,7 +43,7 @@ class Application(tornado.web.Application):
             (r"/api/v1/convert", ConvertHandler, dict(mongo=self.mongo,rabbit=self.writer)),
             (r"/()$", XSRFStaticHandler,
              dict(path=os.path.join(STATIC_DIR, "index.html"))),
-            (r"/static/(.*)", XSRFStaticHandler, dict(path=STATIC_DIR)),
+            (r"/(.*)", XSRFStaticHandler, dict(path=STATIC_DIR)),
         ]
 
         settings = {

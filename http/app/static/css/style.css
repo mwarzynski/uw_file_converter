@@ -1,0 +1,32 @@
+@charset "UTF-8";
+
+body {
+  padding-top: 60px;
+}
+
+section {
+  padding: 15px;
+}
+
+div #progress {
+  display: none;
+  margin-top: 15px;
+}
+
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  -ms-filter: 'alpha(opacity=0)';
+  font-size: 200px !important;
+  direction: ltr;
+  cursor: pointer;
+}
