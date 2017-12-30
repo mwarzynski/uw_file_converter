@@ -41,7 +41,7 @@ class UploadHandler(AuthBaseHandler):
         await self.mongo.uploaded.insert_one({
             'name': self.filename,
             'token': self.token,
-            'user': self.current_user
+            'user': self.current_user.decode('utf-8')
         })
         path = os.path.join(__UPLOAD__, self.token)
         LOG.debug("Opening %s...", path)
