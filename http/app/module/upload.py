@@ -22,6 +22,7 @@ class UploadHandler(AuthBaseHandler):
 
     def __init__(self, *args, **kwargs):
         self.file = None
+        self.filename = ""
         self.token = ""
         self.mongo = None
 
@@ -35,8 +36,10 @@ class UploadHandler(AuthBaseHandler):
         if not self.current_user:
             raise UnauthorizedError()
 
-        self.token = str(uuid.uuid4())
+        self.filename = self.request.headers.get("X-Filename", "")
+        self.token = get_upload_token()
         await self.mongo.uploaded.insert_one({
+            'name': self.filename,
             'token': self.token,
             'user': self.current_user
         })
@@ -46,6 +49,7 @@ class UploadHandler(AuthBaseHandler):
 
     def put(self):
         self.write({
+            'name': self.filename,
             'token': self.token,
             'status': 'OK',
             'bytesReceived': self.bytes_read
@@ -60,3 +64,4 @@ class UploadHandler(AuthBaseHandler):
         if self.file:
             self.file.close()
             self.file = None
+

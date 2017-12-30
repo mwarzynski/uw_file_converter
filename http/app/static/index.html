@@ -8,7 +8,11 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/tether.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -24,76 +28,23 @@
 
 <!-- Container -->
 <div class="container">
-    <section>
-        <span class="btn btn-success fileinput-button">
-            <span>Upload files</span>
-            <input id="fileupload" type="file" name="file">
-        </span>
-        <div id="progress" class="progress">
-            <div class="progress-bar progress-bar-success"></div>
-        </div>
-    </section>
-    <section>
-        <ul id="files">
-        </ul>
-    </section>
+    <div class="row">
+        <section>
+            <span class="btn btn-success fileinput-button">
+                <span>Upload file</span>
+                <input id="fileupload" type="file" name="file">
+            </span>
+            <div id="progress" class="progress">
+                <div class="progress-bar progress-bar-success"></div>
+            </div>
+        </section>
+        <section>
+            <ul id="files" class="list-group"></ul>
+        </section>
+    </div>
 </div>
-</script>
 
-<script src="js/jquery.min.js"></script>
-<script src="js/main.js"></script>
-
-<script type="text/javascript">
-$(function () {
-    'use strict';
-
-    $("#fileupload").change((event) => {
-        let input = event.target;
-
-        if (input.files.length < 1) {
-            return;
-        }
-
-        let reader = new FileReader();
-
-        reader.onload = function() {
-            let fileData = reader.result;
-            let blob = new Blob(
-                [ new Uint8Array(fileData)],
-                { type: input.files[0].type }
-            );
-
-            let request = $.ajax({ 
-                url: '/api/v1/upload',
-                type: 'PUT',
-                contentType: input.files[0].type,
-                data: fileData,
-                processData: false,
-                
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('X-XSRFToken', getCookie("_xsrf"));
-                },
-
-                // TODO: progress bar
-            });
-
-            request.done(function(response) {
-                if (response.status == "OK") {
-                   $('#files').append('<li>' + response.token + '</li>'); 
-                } else {
-                   console.error(response.status);
-                }
-            });
-
-            request.fail(function(error) {
-                console.error(error.statusText);
-            });
-        }
-
-        reader.readAsArrayBuffer(input.files[0]);
-    });
-});
-</script>
+<script src="/js/main.js"></script>
 
 </body>
 </html>
