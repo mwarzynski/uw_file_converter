@@ -22,6 +22,7 @@ class UploadHandler(AuthBaseHandler):
 
     def __init__(self, *args, **kwargs):
         self.file = None
+        self.token = ""
         self.mongo = None
 
         super(UploadHandler, self).__init__(*args, **kwargs)
@@ -34,17 +35,18 @@ class UploadHandler(AuthBaseHandler):
         if not self.current_user:
             raise UnauthorizedError()
 
-        token = str(uuid.uuid4())
+        self.token = str(uuid.uuid4())
         await self.mongo.uploaded.insert_one({
-            'token': token,
+            'token': self.token,
             'user': self.current_user
         })
-        path = os.path.join(__UPLOAD__, token)
+        path = os.path.join(__UPLOAD__, self.token)
         LOG.debug("Opening %s...", path)
         self.file = open(path, "wb")
 
     def put(self):
         self.write({
+            'token': self.token,
             'status': 'OK',
             'bytesReceived': self.bytes_read
         })

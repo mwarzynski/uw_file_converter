@@ -27,59 +27,70 @@
     <section>
         <span class="btn btn-success fileinput-button">
             <span>Upload files</span>
-            <input id="fileupload" type="file" name="files[]" multiple>
+            <input id="fileupload" type="file" name="file">
         </span>
         <div id="progress" class="progress">
             <div class="progress-bar progress-bar-success"></div>
         </div>
     </section>
+    <section>
+        <ul id="files">
+        </ul>
+    </section>
 </div>
 </script>
 
 <script src="js/jquery.min.js"></script>
+<script src="js/main.js"></script>
 
 <script type="text/javascript">
 $(function () {
     'use strict';
 
     $("#fileupload").change((event) => {
-   
         let input = event.target;
+
+        if (input.files.length < 1) {
+            return;
+        }
+
         let reader = new FileReader();
 
-        reader.onload = function(){
-            let arrayBuffer = reader.result;
-            let arrayBufferView = new Uint8Array( arrayBuffer );
-            let blob = new Blob( [ arrayBufferView ], { type: input.files[0].type } );
+        reader.onload = function() {
+            let fileData = reader.result;
+            let blob = new Blob(
+                [ new Uint8Array(fileData)],
+                { type: input.files[0].type }
+            );
 
-            $.ajax({  
-                url: '/api/v1/upload',  
-                type: 'PUT',  
+            let request = $.ajax({ 
+                url: '/api/v1/upload',
+                type: 'PUT',
                 contentType: input.files[0].type,
-                data: arrayBuffer,  
+                data: fileData,
                 processData: false,
-                xhr: function()
-                {
-                    let xhr = new window.XMLHttpRequest();
-                    // TODO: set valid X-XSRFToken for upload request.
-                    xhr.setRequestHeader('X-XSRFToken', $.cookie("_xsrf"));
-                    xhr.upload.addEventListener("progress", function(data){
-                        if (data.lengthComputable) {
-                          var progress = parseInt( parseFloat(data.loaded / data.total) * 100);
-                          $('#progressPercentage').css( 'width', progress + '%'); 
-                        }
-                    }, false);
-                    return xhr;
+                
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('X-XSRFToken', getCookie("_xsrf"));
                 },
 
-                success : function(result) {
-                    console.log(result);
-                },
+                // TODO: progress bar
+            });
 
-            }); 
+            request.done(function(response) {
+                if (response.status == "OK") {
+                   $('#files').append('<li>' + response.token + '</li>'); 
+                } else {
+                   console.error(response.status);
+                }
+            });
+
+            request.fail(function(error) {
+                console.error(error.statusText);
+            });
         }
-        reader.readAsArrayBuffer(input.files[0]);
 
+        reader.readAsArrayBuffer(input.files[0]);
     });
 });
 </script>
