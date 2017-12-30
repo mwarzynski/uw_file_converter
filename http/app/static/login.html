@@ -12,8 +12,6 @@
     <script src="/js/jquery.min.js"></script>
     <script src="/js/tether.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
-
-    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -28,27 +26,18 @@
 
 <!-- Container -->
 <div class="container">
-    <div class="row">
-        <section class="col">
-            <span class="btn btn-lg btn-primary fileupload-button">
-                <span>Upload file</span>
-                <input id="fileupload" type="file" name="file">
-            </span>
-            <!-- TODO: Progress Bar.
-            <div id="progress" class="progress">
-                <div class="progress-bar progress-bar-success"></div>
-            </div>
-            -->
-        </section>
-        <section class="col">
-            <ul id="files" class="list-group"></ul>
-        </section>
-    </div>
+  <form class="form-signin" id="login">
+    <label for="inputUsername" class="sr-only">Username</label>
+    <input type="text" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
+    <label for="inputPassword" class="sr-only">Password</label>
+    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+  </form>
 </div>
 
 <!-- Scripts -->
 <script src="/js/main.js"></script>
-<script src="/js/index.js"></script>
+<script src="/js/login.js"></script>
 
 </body>
 </html>

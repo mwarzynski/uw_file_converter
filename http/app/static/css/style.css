@@ -1,25 +1,18 @@
 @charset "UTF-8";
 
-body {
-  padding-top: 60px;
-}
-
-section {
-  padding: 15px;
-}
-
 div #progress {
   display: none;
   margin-top: 15px;
 }
 
-.fileinput-button {
+.fileupload-button {
   position: relative;
   overflow: hidden;
   display: inline-block;
+  width: 100%;
 }
 
-.fileinput-button input {
+.fileupload-button input {
   position: absolute;
   top: 0;
   right: 0;
