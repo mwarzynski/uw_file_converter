@@ -1,6 +1,7 @@
 """ File upload handling module """
 import uuid
 import tornado.web
+import tornado.gen
 import logging
 import os
 import json
@@ -45,11 +46,11 @@ class ConvertHandler(AuthBaseHandler):
             self.set_status(400)
             return
 
-        exists = self.mongo.uploaded.find_one({
+        file = await self.mongo.uploaded.find_one({
             'token': token,
-            'user': self.current_user
+            'user': self.current_user.decode('utf-8')
         })
-        if not exists:
+        if not file:
             LOG.warning("There is no uploaded file for token: " + str(token))
             self.clear()
             self.set_status(404)
@@ -61,6 +62,7 @@ class ConvertHandler(AuthBaseHandler):
             'convert_from': convert_from,
             'convert_to': convert_to,
             'token': token,
+            'name': file['name'],
             'user': self.current_user.decode('utf-8')
         }
         self.rabbit.send(json.dumps(message))

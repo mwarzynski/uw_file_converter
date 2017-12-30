@@ -37,7 +37,7 @@ class DownloadHandler(AuthBaseHandler):
             self.set_status(404)
             return
 
-        path = result["file-output"]
+        path = result["filepath"]
 
         if not os.path.isfile(path):
             self.clear()
@@ -45,6 +45,9 @@ class DownloadHandler(AuthBaseHandler):
             return
 
         LOG.debug("Opening %s...", path)
+
+        self.set_header('Content-Type', 'application/octet-stream')
+        self.set_header('Content-Disposition', 'attachment; filename=' + result['token'] + '.' + result['filetype'])
 
         with open(path, 'rb') as f:
             data = f.read()

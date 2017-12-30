@@ -23,3 +23,8 @@ div #progress {
   direction: ltr;
   cursor: pointer;
 }
+
+#files button {
+    width: 150px;
+    cursor: pointer;
+}

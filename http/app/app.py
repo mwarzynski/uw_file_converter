@@ -10,6 +10,7 @@ from module.upload import UploadHandler
 from module.download import DownloadHandler
 from module.auth import (LoginHandler, LogoutHandler)
 from module.convert import ConvertHandler
+from module.files import FilesHandler
 from messages.writer import Writer
 
 STATIC_DIR = "./static"
@@ -38,9 +39,10 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/api/v1/auth/login", LoginHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/logout", LogoutHandler, dict(mongo=self.mongo)),
-            (r"/api/v1/upload", UploadHandler, dict(mongo=self.mongo)),
-            (r"/api/v1/download/(.*)", DownloadHandler, dict(mongo=self.mongo)),
-            (r"/api/v1/convert", ConvertHandler, dict(mongo=self.mongo,rabbit=self.writer)),
+            (r"/api/v1/files", FilesHandler, dict(mongo=self.mongo)),
+            (r"/api/v1/files/upload", UploadHandler, dict(mongo=self.mongo)),
+            (r"/api/v1/files/download/(.*)", DownloadHandler, dict(mongo=self.mongo)),
+            (r"/api/v1/files/convert", ConvertHandler, dict(mongo=self.mongo,rabbit=self.writer)),
             (r"/()$", XSRFStaticHandler,
              dict(path=os.path.join(STATIC_DIR, "index.html"))),
             (r"/(.*)", XSRFStaticHandler, dict(path=STATIC_DIR)),

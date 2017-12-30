@@ -27,6 +27,7 @@ class Converter:
 
         try:
             token = data['token']
+            filename = data['name']
             input = __UPLOAD__ + "/" + token
             type_from = data['convert_from']
             type_to = data['convert_to']
@@ -39,15 +40,20 @@ class Converter:
 
         message = {
             "user": user,
+            "name": filename,
             "token": token,
-            "file-input": input,
-            "file-output": output
+            "filepath": output,
+            "filetype": type_to,
         }
 
         try:
             self.convert(type_from, type_to, input, output)
         except FileNotFoundError:
             message["status"] = "file not found"
+            self.notify(message)
+            return
+        except NotImplementedError as e:
+            message["status"] = "not supported types"
             self.notify(message)
             return
         except Exception as e:
@@ -63,7 +69,8 @@ class Converter:
         for converter in self.converters:
             if converter.can_convert(type_from, type_to):
                 converter.convert(type_from, type_to, input, output)
-                break
+                return
+        raise NotImplementedError("suitable converter not found")
 
     def notify(self, message):
         message['converted_at'] = int(time.time())

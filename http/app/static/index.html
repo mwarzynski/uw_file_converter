@@ -28,8 +28,9 @@
 
 <!-- Container -->
 <div class="container">
-    <div class="row">
-        <section class="col">
+    <!-- Upload form -->
+    <div class="row mt-3">
+        <div class="col">
             <span class="btn btn-lg btn-primary fileupload-button">
                 <span>Upload file</span>
                 <input id="fileupload" type="file" name="file">
@@ -39,11 +40,40 @@
                 <div class="progress-bar progress-bar-success"></div>
             </div>
             -->
-        </section>
-        <section class="col">
-            <ul id="files" class="list-group"></ul>
-        </section>
+        </div>
     </div>
+    <!-- Uploaded files -->
+    <div class="row mt-3">
+        <div class="col">
+			<table class="table">
+			  <thead>
+				<tr>
+				  <th scope="col">Filename</th>
+				  <th scope="col"></th>
+				</tr>
+			  </thead>
+			  <tbody id="files"></tbody>
+			</table>
+        </div>
+    </div>
+
+    <!-- Converted files -->
+    <div class="row mt-3">
+        <div class="col">
+			<table class="table">
+			  <thead>
+				<tr>
+				  <th scope="col">Filename</th>
+                  <th scope="col">Type</th>
+                  <th scope="col"></th>
+				</tr>
+			  </thead>
+			  <tbody id="converted-files"></tbody>
+			</table>
+        </div>
+    </div>
+
+
 </div>
 
 <!-- Scripts -->
