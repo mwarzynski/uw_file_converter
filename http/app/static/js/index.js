@@ -36,20 +36,28 @@ function addConvertedFile(file) {
 }
 
 function fetchUploadedFiles() {
+    localStorage.files = null;
+
     let request = $.ajax({
         url: "/api/v1/files",
     });
 
     request.done(function(data) {
         let files = data['files'];
-        localStorage.files = null;
         for (let i = 0; i < files.length; i++) {
             addUploadedFile(files[i].name, files[i].token);
         }
+        showUploadedFiles();
+    });
+
+    request.fail(function(err) {
+        $("#files").append('<tr class="bg-danger"><td scope="row">Something went wrong.</td><td></td></tr>');
     });
 }
 
 function fetchConvertedFiles() {
+    localStorage.converted_files = null;
+
     let request = $.ajax({
         url: "/api/v1/files",
         data: {
@@ -59,7 +67,6 @@ function fetchConvertedFiles() {
 
     request.done(function(data) {
         let files = data['files'];
-        localStorage.converted_files = null;
         for (let i = 0; i < files.length; i++) {
             addConvertedFile({
                 'filename': files[i].name,
@@ -68,12 +75,17 @@ function fetchConvertedFiles() {
                 'status': files[i].status
             });
         }
+        showConvertedFiles();
+    });
+
+    request.fail(function(err) {
+    	$("#converted-files").append('<tr class="bg-danger"><td scope="row">Something went wrong.</td><td></td><td></td></tr>');
     });
 }
 
 function showUploadedFile(filename, token) {
 	let actionButton = '<button class="btn btn-primary" onclick="convertFile(\'' + token + '\', \'m4a\', \'mp3\')">Convert</button>';
-	$("#files").append('<tr>' + '<th scope="row">' + filename + '</th><td>' + actionButton + '</td></tr>');
+	$("#files").append('<tr>' + '<td scope="row">' + filename + '</td><td>' + actionButton + '</td></tr>');
 }
 
 function showUploadedFiles() {
@@ -186,8 +198,5 @@ $(function () {
 
     fetchUploadedFiles();
     fetchConvertedFiles();
-
-    showUploadedFiles();
-    showConvertedFiles();
 });
 
