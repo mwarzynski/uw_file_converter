@@ -37,6 +37,7 @@ function addConvertedFile(file) {
 
 function fetchUploadedFiles() {
     localStorage.files = null;
+    $("#files").html("");
 
     let request = $.ajax({
         url: "/api/v1/files",
@@ -57,6 +58,7 @@ function fetchUploadedFiles() {
 
 function fetchConvertedFiles() {
     localStorage.converted_files = null;
+    $("#converted-files").html("");
 
     let request = $.ajax({
         url: "/api/v1/files",
@@ -84,7 +86,7 @@ function fetchConvertedFiles() {
 }
 
 function showUploadedFile(filename, token) {
-	let actionButton = '<button class="btn btn-primary" data-toggle="modal" data-target="#convertModal" onclick="convertModal(\'' + token + '\')">Convert</button>';
+	let actionButton = '<button class="btn btn-primary" data-toggle="modal" data-target="#convertModal" onclick="convertModal(\'' + token + '\')">Convert</button><button class="btn btn-danger" onclick="deleteFile(\'' + token + '\')">Delete</button>';
 	$("#files").append('<tr>' + '<td scope="row">' + filename + '</td><td>' + actionButton + '</td></tr>');
 }
 
@@ -146,6 +148,25 @@ function convertFile() {
 
 function downloadFile(token) {
     window.location = "/api/v1/files/download/" + token
+}
+
+function deleteFile(token) {
+	let request = $.ajax({
+		url: "/api/v1/files/delete/" + token,
+		type: "POST",
+
+		beforeSend: function (r) {
+			r.setRequestHeader('X-XSRFToken', getCookie("_xsrf"));
+		},
+	});
+
+    request.done(function(request) {
+        fetchUploadedFiles();    
+    });
+
+	request.fail(function(error) {
+		console.error(error);
+	});
 }
 
 function initializeUpload() {
