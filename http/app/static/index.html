@@ -69,13 +69,41 @@
 			</table>
         </div>
     </div>
-
-
 </div>
 
 <!-- Scripts -->
 <script src="/js/main.js"></script>
 <script src="/js/index.js"></script>
+
+<!-- Convert Modal -->
+<div class="modal fade" id="convertModal" tabindex="-1" role="dialog" aria-labelledby="convertModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="convertModalLabel">Convert file</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <input type="text" id="convert-token" style="display: none;">
+          <div class="form-group">
+            <label for="source-type" class="form-control-label">Source type:</label>
+            <input type="text" class="form-control" id="source-type">
+          </div>
+          <div class="form-group">
+            <label for="destination-type" class="form-control-label">Destination type:</label>
+            <input type="text" class="form-control" id="destination-type">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="convertFile()">Convert</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

@@ -84,7 +84,7 @@ function fetchConvertedFiles() {
 }
 
 function showUploadedFile(filename, token) {
-	let actionButton = '<button class="btn btn-primary" onclick="convertFile(\'' + token + '\', \'m4a\', \'mp3\')">Convert</button>';
+	let actionButton = '<button class="btn btn-primary" data-toggle="modal" data-target="#convertModal" onclick="convertModal(\'' + token + '\')">Convert</button>';
 	$("#files").append('<tr>' + '<td scope="row">' + filename + '</td><td>' + actionButton + '</td></tr>');
 }
 
@@ -109,7 +109,18 @@ function showConvertedFiles() {
     }
 }
 
-function convertFile(token, convert_from, convert_to) {
+function convertModal(token) {
+    $("#convert-token").val(token);
+}
+
+function convertFile() {
+    let token = $("#convert-token").val();
+    let convert_from = $("#source-type").val();
+    let convert_to = $("#destination-type").val();
+
+    $("#source-type").val("");
+    $("#destination-type").val("");
+
 	let request = $.ajax({
 		url: "/api/v1/files/convert",
 		type: "POST",
@@ -129,6 +140,8 @@ function convertFile(token, convert_from, convert_to) {
 	request.fail(function(error) {
 		console.error(error);
 	});
+
+    $("#convertModal").modal('hide');
 }
 
 function downloadFile(token) {
@@ -187,6 +200,10 @@ function initializeUpload() {
     });
 }
 
+function initializeConvertionModal() {
+
+}
+
 $(function () {
     'use strict';
 
@@ -195,6 +212,7 @@ $(function () {
     }
 
     initializeUpload();
+	initializeConvertionModal();
 
     fetchUploadedFiles();
     fetchConvertedFiles();
