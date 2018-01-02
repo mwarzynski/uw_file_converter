@@ -99,7 +99,7 @@ function showUploadedFiles() {
 }
 
 function showConvertedFile(filename, token, type) {
-	let actionButton = '<button class="btn btn-success" onclick="downloadFile(\'' + token + '\')">Download</button>';
+	let actionButton = '<button class="btn btn-success" onclick="downloadFile(\'' + token + '\', \'' + type + '\')">Download</button>';
 	$("#converted-files").append('<tr>' + '<td scope="row">' + filename + '</td><td>' + type + '</td><td>' + actionButton + '</td></tr>');
 }
 
@@ -146,8 +146,11 @@ function convertFile() {
     $("#convertModal").modal('hide');
 }
 
-function downloadFile(token) {
-    window.location = "/api/v1/files/download/" + token
+function downloadFile(token, type) {
+    var link = document.createElement("a");
+    link.download = token + "." + type ;
+    link.href = "/api/v1/files/download/" + token;
+    link.click();
 }
 
 function deleteFile(token) {
