@@ -6,6 +6,8 @@ $(function () {
     }
 
     $("#register").submit(function (ev) {
+        $("#successBox").css("display", "none");
+        $("#errorBox").css("display", "none");
         ev.preventDefault();
 
         let form = ev.target;
@@ -27,10 +29,14 @@ $(function () {
         });
 
         request.done(function(response) {
-            window.location = "/";
+            $("#successBox").css("display", "block");
+            setInterval(function() {
+              window.location = "/";
+            }, 1000);
         });
 
         request.fail(function(response) {
+            $("#errorBox").css("display", "block");
             console.error(response);
         });
     });
