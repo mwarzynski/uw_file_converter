@@ -54,3 +54,40 @@ class DeleteHandler(AuthBaseHandler):
         except:
             pass
 
+class ConvertDeleteHandler(AuthBaseHandler):
+    """ Handler for POST convert requests """
+
+    def __init__(self, *args, **kwargs):
+        self.mongo = None
+
+        super(DeleteHandler, self).__init__(*args, **kwargs)
+
+    def initialize(self, mongo):
+        self.mongo = mongo
+
+    async def post(self, token):
+        if not self.current_user:
+            raise UnauthorizedError()
+
+        result = await self.mongo.converts.find_one({
+            'token': token,
+            'user': self.current_user.decode('utf-8')
+        })
+        if not result:
+            LOG.warning("There is no converted file for token: " + str(token))
+            self.clear()
+            self.set_status(404)
+            return
+
+        path = result['filepath']
+
+        if not os.path.isfile(path):
+            self.clear()
+            self.set_status(404)
+            return
+
+        try:
+            os.remove(path)
+        except:
+            pass
+

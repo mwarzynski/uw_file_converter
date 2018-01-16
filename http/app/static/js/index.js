@@ -97,7 +97,7 @@ function showUploadedFiles() {
 }
 
 function showConvertedFile(filename, token, type) {
-	let actionButton = '<button class="btn btn-success" onclick="downloadFile(\'' + token + '\', \'' + type + '\')">Download</button>';
+	let actionButton = '<button class="btn btn-success" onclick="downloadFile(\'' + token + '\', \'' + type + '\')">Download</button><button class="btn btn-danger" onclick="deleteConvertedFile(\'' + token + '\')">Delete</button>';
 	$("#converted-files").append('<tr>' + '<td scope="row">' + filename + '</td><td>' + type + '</td><td>' + actionButton + '</td></tr>');
 }
 
@@ -166,6 +166,25 @@ function deleteFile(token) {
 
     request.done(function(request) {
         fetchUploadedFiles();    
+    });
+
+	request.fail(function(error) {
+		console.error(error);
+	});
+}
+
+function deleteConvertedFile(token) {
+	let request = $.ajax({
+        url: "/api/v1/files/convert/delete/" + token,
+		type: "POST",
+
+		beforeSend: function (r) {
+			r.setRequestHeader('X-XSRFToken', getCookie("_xsrf"));
+		},
+	});
+
+    request.done(function(request) {
+        fetchConvertedFiles(); 
     });
 
 	request.fail(function(error) {
