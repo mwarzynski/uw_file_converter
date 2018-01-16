@@ -46,7 +46,7 @@ class Application(tornado.web.Application):
             (r"/api/v1/files/download/(.*)", DownloadHandler, dict(mongo=self.mongo)),
             (r"/api/v1/files/delete/(.*)", DeleteHandler, dict(mongo=self.mongo)),
             (r"/api/v1/files/convert", ConvertHandler, dict(mongo=self.mongo,rabbit=self.writer)),
-            (r"/api/v1/files/convert/delete", ConvertDeleteHandler, dict(mongo=self.mongo)),
+            (r"/api/v1/files/convert/delete/(.*)", ConvertDeleteHandler, dict(mongo=self.mongo)),
             (r"/()$", XSRFStaticHandler,
              dict(path=os.path.join(STATIC_DIR, "index.html"))),
             (r"/(.*)", XSRFStaticHandler, dict(path=STATIC_DIR)),
