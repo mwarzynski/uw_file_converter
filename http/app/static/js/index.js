@@ -36,30 +36,26 @@ function addConvertedFile(file) {
 }
 
 function fetchUploadedFiles() {
-    localStorage.files = null;
-    $("#files").html("");
-
     let request = $.ajax({
         url: "/api/v1/files",
     });
 
     request.done(function(data) {
+        localStorage.files = null;
         let files = data['files'];
         for (let i = 0; i < files.length; i++) {
             addUploadedFile(files[i].name, files[i].token);
         }
+        $("#files").html("");
         showUploadedFiles();
     });
 
     request.fail(function(err) {
-        $("#files").append('<tr class="bg-danger"><td scope="row">Something went wrong.</td><td></td></tr>');
+        console.error(err);
     });
 }
 
-function fetchConvertedFiles() {
-    localStorage.converted_files = null;
-    $("#converted-files").html("");
-
+function fetchConvertedFiles() { 
     let request = $.ajax({
         url: "/api/v1/files",
         data: {
@@ -68,6 +64,7 @@ function fetchConvertedFiles() {
     });
 
     request.done(function(data) {
+        localStorage.converted_files = null;
         let files = data['files'];
         for (let i = 0; i < files.length; i++) {
             addConvertedFile({
@@ -77,11 +74,12 @@ function fetchConvertedFiles() {
                 'status': files[i].status
             });
         }
+        $("#converted-files").html("");
         showConvertedFiles();
     });
 
     request.fail(function(err) {
-    	$("#converted-files").append('<tr class="bg-danger"><td scope="row">Something went wrong.</td><td></td><td></td></tr>');
+        console.error(err);
     });
 }
 
@@ -138,6 +136,9 @@ function convertFile() {
 			r.setRequestHeader('X-XSRFToken', getCookie("_xsrf"));
 		},
 	});
+    
+    request.done(function(e) {
+    });
 
 	request.fail(function(error) {
 		console.error(error);
@@ -171,6 +172,10 @@ function deleteFile(token) {
 		console.error(error);
 	});
 }
+
+function initializeConvertionModal() {
+
+};
 
 function initializeUpload() {
     $("#fileupload").change((event) => {
@@ -239,10 +244,6 @@ function initializeUpload() {
     });
 }
 
-function initializeConvertionModal() {
-
-}
-
 $(function () {
     'use strict';
 
@@ -255,5 +256,11 @@ $(function () {
 
     fetchUploadedFiles();
     fetchConvertedFiles();
+
+    setInterval(function() {
+        // Well, fuck me for this solution.
+        fetchUploadedFiles();
+        fetchConvertedFiles();
+    }, 5000);
 });
 
