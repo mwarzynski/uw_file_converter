@@ -201,7 +201,23 @@ function initializeUpload() {
                     xhr.setRequestHeader('X-XSRFToken', getCookie("_xsrf"));
                 },
 
-                // TODO: (chivay?) Progress Bar...
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            $('.progress').css({
+                                width: percentComplete * 100 + '%'
+                            });
+                            if (percentComplete === 1) {
+                                $('.progress').css('display', 'none');
+                            } else {
+                                $('.progress').css('display', 'block');
+                            }
+                        }
+                    }, false);
+                    return xhr;
+                },
             });
 
             request.done(function(response) {
@@ -214,9 +230,8 @@ function initializeUpload() {
             });
 
             request.fail(function(error) {
-                // TODO: Nice error notification using Bootstrap CSS...
                 console.error(error.statusText);
-                alert("Something went wrong.");
+                alert("Something went wrong while uploading file.");
             });
         }
 
