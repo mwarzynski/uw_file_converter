@@ -8,7 +8,7 @@ import tornado.web
 import motor.motor_tornado
 from module.upload import UploadHandler
 from module.download import DownloadHandler
-from module.auth import (LoginHandler, LogoutHandler)
+from module.auth import (LoginHandler, LogoutHandler, RegisterHandler)
 from module.convert import ConvertHandler
 from module.files import FilesHandler
 from module.delete import DeleteHandler
@@ -38,6 +38,7 @@ class Application(tornado.web.Application):
         self.mongo = motor.motor_tornado.MotorClient('db', 27017).convertdb
 
         handlers = [
+            (r"/api/v1/auth/register", RegisterHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/login", LoginHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/logout", LogoutHandler, dict(mongo=self.mongo)),
             (r"/api/v1/files", FilesHandler, dict(mongo=self.mongo)),

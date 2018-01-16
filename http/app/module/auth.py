@@ -83,3 +83,32 @@ class LogoutHandler(AuthBaseHandler):
 
     def post(self):
         self.clear_cookie("user")
+
+class RegisterHandler(AuthBaseHandler):
+
+    executor = ThreadPoolExecutor(max_workers=4)
+
+    def initialize(self, mongo):
+        self.mongo = mongo
+
+    async def post(self):
+        username = self.get_argument("user")
+        user_pass = tornado.escape.utf8(self.get_argument("password"))
+
+        user = await self.mongo.users.find_one({
+            'username': {'$eq': username}
+        })
+        if user:
+            LOG.warning("User %s already exists", username)
+            raise tornado.web.HTTPError(401)
+
+        hashed_password = await self.hash_password(user_pass)
+
+        res = await self.mongo.users.insert_one({
+            'username': username,
+            'hashed_password': hashed_password
+        })
+        LOG.info("User %s added", username)
+
+        self.write('OK')
+
