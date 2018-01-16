@@ -97,7 +97,7 @@ function showUploadedFiles() {
 }
 
 function showConvertedFile(filename, token, type) {
-	let actionButton = '<button class="btn btn-success" onclick="downloadFile(\'' + token + '\', \'' + type + '\')">Download</button><button class="btn btn-danger" onclick="deleteConvertedFile(\'' + token + '\')">Delete</button>';
+	let actionButton = '<button class="btn btn-success" onclick="downloadFile(\'' + token + '\', \'' + type + '\')">Download</button><button class="btn btn-danger" onclick="deleteConvertedFile(\'' + token + '\',\'' + type + '\')">Delete</button>';
 	$("#converted-files").append('<tr>' + '<td scope="row">' + filename + '</td><td>' + type + '</td><td>' + actionButton + '</td></tr>');
 }
 
@@ -173,9 +173,9 @@ function deleteFile(token) {
 	});
 }
 
-function deleteConvertedFile(token) {
+function deleteConvertedFile(token, filetype) {
 	let request = $.ajax({
-        url: "/api/v1/files/convert/delete/" + token,
+        url: "/api/v1/files/convert/delete/" + token + "/" + filetype,
 		type: "POST",
 
 		beforeSend: function (r) {

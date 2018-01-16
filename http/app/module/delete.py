@@ -65,12 +65,15 @@ class ConvertDeleteHandler(AuthBaseHandler):
     def initialize(self, mongo):
         self.mongo = mongo
 
-    async def post(self, token):
+    async def post(self, token, filetype):
         if not self.current_user:
             raise UnauthorizedError()
 
+        LOG.info(token + ", " + filetype)
+
         result = await self.mongo.converts.find_one({
             'token': token,
+            'filetype': filetype,
             'user': self.current_user.decode('utf-8')
         })
         if not result:
@@ -89,5 +92,21 @@ class ConvertDeleteHandler(AuthBaseHandler):
         try:
             os.remove(path)
         except:
-            pass
+            LOG.warning("There is no converted file to delete: " + path)
+            self.clear()
+            self.set_status(500)
+            return
+
+        result = await self.mongo.converts.remove({
+            "token": token,
+            "user": self.current_user.decode('utf-8')
+        })
+
+        if not result:
+            self.clear()
+            self.set_status(500)
+            return
+
+        self.clear()
+        self.set_status(200)
 
