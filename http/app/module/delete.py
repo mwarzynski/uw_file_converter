@@ -60,7 +60,7 @@ class ConvertDeleteHandler(AuthBaseHandler):
     def __init__(self, *args, **kwargs):
         self.mongo = None
 
-        super(DeleteHandler, self).__init__(*args, **kwargs)
+        super(ConvertDeleteHandler, self).__init__(*args, **kwargs)
 
     def initialize(self, mongo):
         self.mongo = mongo
