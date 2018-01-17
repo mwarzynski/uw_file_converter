@@ -47,6 +47,7 @@ def callback(ch, method, properties, message):
             ws.write_message({
                 'name': data['name'],
                 'filetype': data['filetype'],
+                'token': data['token'],
                 'converted_at': data['converted_at']
             })
 
