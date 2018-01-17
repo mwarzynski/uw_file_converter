@@ -276,10 +276,9 @@ $(function () {
     fetchUploadedFiles();
     fetchConvertedFiles();
 
-    //setInterval(function() {
-        // Well, fuck me for this solution.
-    //    fetchUploadedFiles();
-    //    fetchConvertedFiles();
-    //}, 5000);
+    let ws = new WebSocket("ws://localhost/api/v1/files/ws");
+    ws.addEventListener('message', function (event) {
+        showConvertedFile(event.data['name'], '', event.data['filetype']);
+    });
 });
 
