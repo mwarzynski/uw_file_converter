@@ -276,10 +276,10 @@ $(function () {
     fetchUploadedFiles();
     fetchConvertedFiles();
 
-    setInterval(function() {
+    //setInterval(function() {
         // Well, fuck me for this solution.
-        fetchUploadedFiles();
-        fetchConvertedFiles();
-    }, 5000);
+    //    fetchUploadedFiles();
+    //    fetchConvertedFiles();
+    //}, 5000);
 });
 

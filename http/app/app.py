@@ -13,6 +13,9 @@ from module.convert import ConvertHandler
 from module.files import FilesHandler
 from module.delete import DeleteHandler, ConvertDeleteHandler
 from messages.writer import Writer
+from messages.rabbit import receive_messages
+from module.websocket import callback
+from module.websocket import NotifierWebSocket
 
 STATIC_DIR = "./static"
 
@@ -41,12 +44,12 @@ class Application(tornado.web.Application):
             (r"/api/v1/auth/register", RegisterHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/login", LoginHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/logout", LogoutHandler, dict(mongo=self.mongo)),
-            (r"/api/v1/files", FilesHandler, dict(mongo=self.mongo)),
             (r"/api/v1/files/upload", UploadHandler, dict(mongo=self.mongo)),
             (r"/api/v1/files/download/(.*)", DownloadHandler, dict(mongo=self.mongo)),
             (r"/api/v1/files/delete/(.*)", DeleteHandler, dict(mongo=self.mongo)),
             (r"/api/v1/files/convert", ConvertHandler, dict(mongo=self.mongo,rabbit=self.writer)),
             (r"/api/v1/files/convert/delete/(.*)/(.*)", ConvertDeleteHandler, dict(mongo=self.mongo)),
+            (r"/api/v1/files/ws", NotifierWebSocket, dict()),
             (r"/()$", XSRFStaticHandler,
              dict(path=os.path.join(STATIC_DIR, "index.html"))),
             (r"/(.*)", XSRFStaticHandler, dict(path=STATIC_DIR)),
@@ -61,6 +64,8 @@ class Application(tornado.web.Application):
 
 if __name__ == "__main__":
     signal.signal(signal.SIGTERM, term_handler)
+
+    receive_messages(callback)
 
     try:
         # Intitialize HTTP server.
