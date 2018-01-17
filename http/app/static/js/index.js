@@ -278,7 +278,8 @@ $(function () {
 
     let ws = new WebSocket("ws://localhost/api/v1/files/ws");
     ws.addEventListener('message', function (event) {
-        showConvertedFile(event.data['name'], '', event.data['filetype']);
+        let data = JSON.parse(event.data);
+        showConvertedFile(data['name'], data['token'], data['filetype']);
     });
 });
 
