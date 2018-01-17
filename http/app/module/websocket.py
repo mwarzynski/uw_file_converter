@@ -32,13 +32,21 @@ class NotifierWebSocket(tornado.websocket.WebSocketHandler, AuthBaseHandler):
 
 
 def callback(ch, method, properties, message):
-    LOG.debug(message)
-    return
-    for ws in live_web_sockets:
+    try:
+        data = json.loads(message)
+    except:
+        LOG.error("invalid done message")
+        return
+
+    LOG.debug("done message: " + message)
+    if data['user'] in live_web_sockets:
+        ws = live_web_sockets[data['user']]
         if not ws.ws_connection or not ws.ws_connection.stream.socket:
-            removable.add(ws)
+            del live_web_sockets[data['user']]
         else:
-            ws.write_message(message)
-    for ws in removable:
-        live_web_sockets.remove(ws)
+            ws.write_message({
+                'name': data['name'],
+                'filetype': data['filetype'],
+                'converted_at': data['converted_at']
+            })
 

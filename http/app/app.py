@@ -44,6 +44,7 @@ class Application(tornado.web.Application):
             (r"/api/v1/auth/register", RegisterHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/login", LoginHandler, dict(mongo=self.mongo)),
             (r"/api/v1/auth/logout", LogoutHandler, dict(mongo=self.mongo)),
+            (r"/api/v1/files", FilesHandler, dict(mongo=self.mongo)),
             (r"/api/v1/files/upload", UploadHandler, dict(mongo=self.mongo)),
             (r"/api/v1/files/download/(.*)", DownloadHandler, dict(mongo=self.mongo)),
             (r"/api/v1/files/delete/(.*)", DeleteHandler, dict(mongo=self.mongo)),
