@@ -20,13 +20,13 @@ services:
 
   # nginx for glueing outside world with the application
   proxy:
-    image: nginx:1.13.7-alpine
+    build: ./nginx
     ports:
       - 80:80
     networks:
       - frontend
     volumes:
-      - ./nginx:/etc/nginx
+      - ./nginx/conf:/etc/nginx
     depends_on:
       - "http-server"
 
