@@ -30,6 +30,16 @@ services:
     depends_on:
       - "http-server"
 
+  # One instance for WS support
+  ws-server:
+    build: ./ws
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - "rabbitmq"
+      - "db"
+
   # Multiple instances of backend HTTP servers handling API requests
   http-server:
     build: ./http
