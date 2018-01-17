@@ -38,16 +38,17 @@ class UploadHandler(AuthBaseHandler):
 
         self.filename = self.request.headers.get("X-Filename", "")
         self.token = get_upload_token()
-        await self.mongo.uploaded.insert_one({
-            'name': self.filename,
-            'token': self.token,
-            'user': self.current_user.decode('utf-8')
-        })
         path = os.path.join(__UPLOAD__, self.token)
         LOG.debug("Opening %s...", path)
         self.file = open(path, "wb")
 
     def put(self):
+        self.mongo.uploaded.insert_one({
+            'name': self.filename,
+            'token': self.token,
+            'user': self.current_user.decode('utf-8')
+        })
+
         self.write({
             'name': self.filename,
             'token': self.token,
