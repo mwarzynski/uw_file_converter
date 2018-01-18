@@ -263,6 +263,24 @@ function initializeUpload() {
     });
 }
 
+function logoutUser() {
+        let request = $.ajax({
+            url: "/api/v1/auth/logout",
+            method: "POST",
+            beforeSend: function (r) {
+                r.setRequestHeader('X-XSRFToken', getCookie("_xsrf"));
+            }
+        });
+
+        request.done(function(response) {
+            window.location = "/login.html";
+        });
+
+        request.fail(function(response) {
+            console.error(response);
+        });
+}
+
 $(function () {
     'use strict';
 
@@ -280,6 +298,10 @@ $(function () {
     ws.addEventListener('message', function (event) {
         let data = JSON.parse(event.data);
         showConvertedFile(data['name'], data['token'], data['filetype']);
+    });
+
+    $("#logoutButton").click(function() {
+        logoutUser();
     });
 });
 
