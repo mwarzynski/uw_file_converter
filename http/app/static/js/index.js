@@ -286,7 +286,9 @@ $(function () {
 
     if (getCookie('user') === "") {
         window.location = "/login.html";
+        return;
     }
+    $('.container').css('display', 'block');
 
     initializeUpload();
 	initializeConvertionModal();
