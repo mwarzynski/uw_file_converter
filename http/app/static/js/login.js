@@ -6,6 +6,7 @@ $(function () {
     }
 
     $("#login").submit(function (ev) {
+        $("#errorBox").css("display", "none");
         ev.preventDefault();
 
         let form = ev.target;
@@ -31,6 +32,7 @@ $(function () {
         });
 
         request.fail(function(response) {
+            $("#errorBox").css("display", "block");
             console.error(response);
         });
     });
